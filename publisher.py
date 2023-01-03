@@ -18,6 +18,7 @@ class Publisher:
             print(f"Starting up {self.writer.get_extra_info('sockname')} ({self.id})")
         except ConnectionRefusedError as exception:
             print(f"Could not connected to server: {exception}")
+        return self
 
     async def close(self):
         self.writer.close()

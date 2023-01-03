@@ -14,7 +14,7 @@ SEND_QUEUES: defaultdict[StreamWriter, Queue] = defaultdict(Queue)
 CHANNEL_QUEUES: Dict[bytes, Queue] = {}
 
 
-async def server(reader: StreamReader, writer: StreamWriter):
+async def run_broker(reader: StreamReader, writer: StreamWriter):
     peername = writer.get_extra_info('peername')
     subscriber_channel = await read_data(reader)
     SUBSCRIBERS[subscriber_channel].append(writer)
@@ -83,6 +83,6 @@ async def main(*args, **kwargs):
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main(server, host="127.0.0.1", port=8000))
+        asyncio.run(main(run_broker, host="127.0.0.1", port=8000))
     except KeyboardInterrupt:
         print("Bye!")
