@@ -1,25 +1,35 @@
 import asyncio
-from contextlib import asynccontextmanager
-import uuid
-from utils import write_data
+from contextlib import AbstractAsyncContextManager
+from threading import Thread
+import time
+from publisher import Publisher
+from server import run_broker
 
 
-@asynccontextmanager
-async def publish_to_stream(host: str, port: int):
-    me = uuid.uuid4().hex[:8]
-    print(f"Starting up {me}")
-    _, writer = await asyncio.open_connection(host=host, port=port)
-    print(f"I am {writer.get_extra_info('sockname')}")
+def _start_server(host: str, port: int):
+    async def _start_cb(server_fn, host, port):
+        broker = await asyncio.start_server(server_fn, host=host, port=port)
+        async with broker:
+            await broker.serve_forever()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(_start_cb(run_broker, host, port))
+    loop.close()
 
-    # subscribing to /null since we are publisher (handshake with broker)
-    await write_data(writer, b'/null')
 
-    try:
-        yield writer
-    except asyncio.CancelledError:
-        writer.close()
-        await writer.wait_closed()
-    finally:
-        writer.close()
-        await writer.wait_closed()
-        print("Released connection to broker.")
+class stream_data(AbstractAsyncContextManager):
+    """Context manager for streaming data."""
+    def __init__(self, host: str, port: int):
+        self.host = host
+        self.port = port
+
+    async def __aenter__(self):
+        self.server_thread = Thread(
+            target=_start_server, args=(self.host, self.port), daemon=True)
+        self.server_thread.start()
+        time.sleep(2)
+        self.publisher = await Publisher(self.host, self.port).connect()
+        return self.publisher
+
+    async def __aexit__(self, *args, **kwargs):
+        await self.publisher.close()

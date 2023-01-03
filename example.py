@@ -1,29 +1,17 @@
 """Typical use case for the pub/sub messaging system"""
 import asyncio
-from ctx import publish_to_stream
-from utils import write_data
-
-host = "127.0.0.1"
-port = 8000
-channel = "/general"
+from ctx import stream_data
 
 
 async def main(host, port, channel):
-    async with publish_to_stream(host, port) as writer:
+    async with stream_data(host, port) as publisher:
         print("Initiating the program...")
         assert 1 + 1 == 2
         print("Doing a bunch of stuff...")
-
-        chan = channel.encode()
-
         for i in range(10):
-            msg = str(i).encode()
-            try:
-                await write_data(writer, chan)
-                await write_data(writer, msg)
-            except OSError:
-                print("Connection ended.")
-                break
+            msg = str(i)
+            await publisher.publish(msg, channel)
+            await asyncio.sleep(1)
         print("Done")
 
 
