@@ -27,7 +27,7 @@ class stream_data(AbstractAsyncContextManager):
         self.server_thread = Thread(
             target=_start_server, args=(self.host, self.port), daemon=True)
         self.server_thread.start()
-        time.sleep(2)
+        time.sleep(2)  # TODO: rm that
         self.publisher = await Publisher(self.host, self.port).connect()
         return self.publisher
 

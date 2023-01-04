@@ -73,16 +73,3 @@ async def send_to_channel(channel_name: bytes):
                 if not SEND_QUEUES[writer].full():
                     print(f"Send: {msg[:19]}...")
                     await SEND_QUEUES[writer].put(msg)
-
-
-async def main(*args, **kwargs):
-    server = await asyncio.start_server(*args, **kwargs)
-    async with server:
-        await server.serve_forever()
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main(run_broker, host="127.0.0.1", port=8000))
-    except KeyboardInterrupt:
-        print("Bye!")
