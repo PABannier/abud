@@ -24,6 +24,7 @@ class stream_data(AbstractAsyncContextManager):
         self.port = port
 
     async def __aenter__(self):
+        """Spawn a thread to run a broker and yield a publisher."""
         self.server_thread = Thread(
             target=_start_server, args=(self.host, self.port), daemon=True)
         self.server_thread.start()
@@ -32,4 +33,5 @@ class stream_data(AbstractAsyncContextManager):
         return self.publisher
 
     async def __aexit__(self, *args, **kwargs):
+        """Close the connection to broker and kills the thread."""
         await self.publisher.close()

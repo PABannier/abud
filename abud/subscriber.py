@@ -13,6 +13,9 @@ class Subscriber:
     
     port : int
         Port.
+    
+    id : str
+        Unique id.
     """
     def __init__(self, host: str, port: int):
         self.host = host
