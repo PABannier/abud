@@ -8,7 +8,7 @@ from abud.utils import read_data, write_data
 
 # Maps every channel to a list of subscribers
 SUBSCRIBERS: defaultdict[bytes, deque[StreamWriter]] = defaultdict(deque)
-# Maps every subscriber to a list of messages to be broadcasted 
+# Maps every subscriber to a list of messages to be broadcasted
 SEND_QUEUES: defaultdict[StreamWriter, Queue] = defaultdict(Queue)
 # Maps every channel to a list of messages to be broadcasted
 CHANNEL_QUEUES: Dict[bytes, Queue] = {}
@@ -47,15 +47,15 @@ async def send_to_subscriber(writer: StreamWriter, queue: Queue):
             data = await queue.get()
         except asyncio.CancelledError:
             continue
-        
+
         if not data:
             break
-    
+
         try:
             await write_data(writer, data)
         except asyncio.CancelledError:
             await write_data(writer, data)
-    
+
     writer.close()
     await writer.wait_closed()
 

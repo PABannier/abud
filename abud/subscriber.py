@@ -11,7 +11,8 @@ class Subscriber:
 
     async def connect(self, channel: str):
         try:
-            self.reader, self.writer = await asyncio.open_connection(self.host, self.port)
+            self.reader, self.writer = await asyncio.open_connection(
+                self.host, self.port)
             chan = channel.encode()
             await write_data(self.writer, chan)  # subscribing to `channel`
             print(f"Starting up {self.writer.get_extra_info('sockname')} ({self.id})")
