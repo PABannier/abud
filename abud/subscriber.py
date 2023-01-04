@@ -4,12 +4,29 @@ from abud.utils import read_data, write_data
 
 
 class Subscriber:
+    """Subscriber to stream channels.
+    
+    Attributes 
+    ----------
+    host : str
+        Host.
+    
+    port : int
+        Port.
+    """
     def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
         self.id = uuid.uuid4().hex[:8]
 
     async def connect(self, channel: str):
+        """Connect to the specified channel.
+        
+        Parameters
+        ----------
+        channel : str
+            Channel to connect.
+        """
         try:
             self.reader, self.writer = await asyncio.open_connection(
                 self.host, self.port)
@@ -21,6 +38,7 @@ class Subscriber:
             print(f"Could not connected to server: {exception}")
 
     async def listen(self):
+        """Keep listening to the specified channel waiting for data to read."""
         try:
             while data := await read_data(self.reader):
                 print(f"Received: {data[:20]}")
