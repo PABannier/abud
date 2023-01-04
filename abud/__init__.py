@@ -5,3 +5,5 @@ from .subscriber import Subscriber
 
 
 __all__ = [stream_data, Publisher, run_broker, Subscriber]
+
+__version__ = "0.1dev"
