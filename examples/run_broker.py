@@ -1,5 +1,5 @@
 import asyncio
-from abud.server import run_broker
+from abud import run_broker
 
 
 async def main(*args, **kwargs):

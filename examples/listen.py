@@ -1,5 +1,5 @@
 import asyncio
-from abud.subscriber import Subscriber
+from abud import Subscriber
 
 
 async def main(host: str, port: int, channel: str):

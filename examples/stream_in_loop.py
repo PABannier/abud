@@ -1,6 +1,6 @@
 """Typical use case for the pub/sub messaging system"""
 import asyncio
-from abud.ctx import stream_data
+from abud import stream_data
 
 
 async def main(host, port, channel):
