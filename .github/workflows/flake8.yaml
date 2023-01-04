@@ -29,4 +29,4 @@ jobs:
       - name: Check doc style with pydocstyle
         run: |
           pip install pydocstyle
-          pydocstyle abud --ignore='D100',D102,'D104','D107','D203','D213','D413'
+          pydocstyle abud --ignore='D100',D102,'D104','D107','D203','D213','D413','D416'
