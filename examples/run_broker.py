@@ -1,5 +1,5 @@
 import asyncio
-from abud import run_broker
+from abud import connect_to_broker
 
 
 async def main(*args, **kwargs):
@@ -10,6 +10,6 @@ async def main(*args, **kwargs):
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main(run_broker, host="127.0.0.1", port=8000))
+        asyncio.run(main(connect_to_broker, host="127.0.0.1", port=8000))
     except KeyboardInterrupt:
         print("Bye!")

@@ -8,13 +8,23 @@ from abud.utils import read_data, write_data
 
 # Maps every channel to a list of subscribers
 SUBSCRIBERS: defaultdict[bytes, deque[StreamWriter]] = defaultdict(deque)
-# Maps every subscriber to a list of messages to be broadcasted 
+# Maps every subscriber to a list of messages to be broadcasted
 SEND_QUEUES: defaultdict[StreamWriter, Queue] = defaultdict(Queue)
 # Maps every channel to a list of messages to be broadcasted
 CHANNEL_QUEUES: Dict[bytes, Queue] = {}
 
 
-async def run_broker(reader: StreamReader, writer: StreamWriter):
+async def connect_to_broker(reader: StreamReader, writer: StreamWriter):
+    """Connect to the pub/sub system.
+
+    Parameters
+    ----------
+    reader : StreamReader
+        Reader of the node trying to connect.
+
+    writer : StreamWriter
+        Writer of the node trying to connect.
+    """
     peername = writer.get_extra_info('peername')
     subscriber_channel = await read_data(reader)
     SUBSCRIBERS[subscriber_channel].append(writer)
@@ -42,25 +52,40 @@ async def run_broker(reader: StreamReader, writer: StreamWriter):
 
 
 async def send_to_subscriber(writer: StreamWriter, queue: Queue):
+    """Send messages in queue to subscriber.
+
+    Parameters
+    ----------
+    writer : StreamWriter
+        Writer to open socket to subscriber.
+
+    queue : Queue
+        Queue of messages to be sent.
+    """
     while True:
         try:
             data = await queue.get()
         except asyncio.CancelledError:
             continue
-        
+
         if not data:
             break
-    
+
         try:
             await write_data(writer, data)
         except asyncio.CancelledError:
             await write_data(writer, data)
-    
+
     writer.close()
     await writer.wait_closed()
 
 
 async def send_to_channel(channel_name: bytes):
+    """Populate the message queue.
+
+    channel_name : bytes
+        Channel name.
+    """
     with suppress(asyncio.CancelledError):
         while True:
             writers = SUBSCRIBERS[channel_name]

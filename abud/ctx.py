@@ -3,7 +3,7 @@ from contextlib import AbstractAsyncContextManager
 from threading import Thread
 import time
 from abud.publisher import Publisher
-from abud.server import run_broker
+from abud.server import connect_to_broker
 
 
 def _start_server(host: str, port: int):
@@ -13,17 +13,19 @@ def _start_server(host: str, port: int):
             await broker.serve_forever()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(_start_cb(run_broker, host, port))
+    loop.run_until_complete(_start_cb(connect_to_broker, host, port))
     loop.close()
 
 
 class stream_data(AbstractAsyncContextManager):
     """Context manager for streaming data."""
+
     def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
 
     async def __aenter__(self):
+        """Spawn a thread to run a broker and yield a publisher."""
         self.server_thread = Thread(
             target=_start_server, args=(self.host, self.port), daemon=True)
         self.server_thread.start()
@@ -32,4 +34,5 @@ class stream_data(AbstractAsyncContextManager):
         return self.publisher
 
     async def __aexit__(self, *args, **kwargs):
+        """Close the connection to broker and kills the thread."""
         await self.publisher.close()
