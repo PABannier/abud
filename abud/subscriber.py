@@ -5,15 +5,15 @@ from abud.utils import read_data, write_data
 
 class Subscriber:
     """Subscriber to stream channels.
-    
-    Attributes 
+
+    Attributes
     ----------
     host : str
         Host.
-    
+
     port : int
         Port.
-    
+
     id : str
         Unique id.
     """
@@ -25,7 +25,7 @@ class Subscriber:
 
     async def connect(self, channel: str):
         """Connect to the specified channel.
-        
+
         Parameters
         ----------
         channel : str
