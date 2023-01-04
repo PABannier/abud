@@ -1,6 +1,6 @@
 import asyncio
 import uuid
-from utils import write_data
+from abud.utils import write_data
 
 
 class Publisher:
@@ -35,19 +35,3 @@ class Publisher:
             print("Connection ended.")
         except asyncio.CancelledError:
             self.close()
-
-
-async def main(host: str, port: int, channel: str):
-    publisher = Publisher(host, port)
-    await publisher.connect()
-    for i in range(3):
-        await asyncio.sleep(1)
-        await publisher.publish(str(i), channel)
-    await publisher.close()
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main("127.0.0.1", 8000, "/general"))
-    except KeyboardInterrupt:
-        print("Bye!")

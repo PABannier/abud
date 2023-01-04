@@ -3,7 +3,7 @@ from asyncio import StreamReader, StreamWriter, Queue
 from contextlib import suppress
 from collections import defaultdict, deque
 from typing import Dict
-from utils import read_data, write_data
+from abud.utils import read_data, write_data
 
 
 # Maps every channel to a list of subscribers

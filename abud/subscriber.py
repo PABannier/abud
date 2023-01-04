@@ -1,6 +1,6 @@
 import asyncio
 import uuid
-from utils import read_data, write_data
+from abud.utils import read_data, write_data
 
 
 class Subscriber:
