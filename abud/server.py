@@ -3,7 +3,7 @@ from asyncio import StreamReader, StreamWriter, Queue
 from contextlib import suppress
 from collections import defaultdict, deque
 from typing import Dict
-from utils import read_data, write_data
+from abud.utils import read_data, write_data
 
 
 # Maps every channel to a list of subscribers
@@ -14,7 +14,7 @@ SEND_QUEUES: defaultdict[StreamWriter, Queue] = defaultdict(Queue)
 CHANNEL_QUEUES: Dict[bytes, Queue] = {}
 
 
-async def server(reader: StreamReader, writer: StreamWriter):
+async def run_broker(reader: StreamReader, writer: StreamWriter):
     peername = writer.get_extra_info('peername')
     subscriber_channel = await read_data(reader)
     SUBSCRIBERS[subscriber_channel].append(writer)
@@ -73,16 +73,3 @@ async def send_to_channel(channel_name: bytes):
                 if not SEND_QUEUES[writer].full():
                     print(f"Send: {msg[:19]}...")
                     await SEND_QUEUES[writer].put(msg)
-
-
-async def main(*args, **kwargs):
-    server = await asyncio.start_server(*args, **kwargs)
-    async with server:
-        await server.serve_forever()
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main(server, host="127.0.0.1", port=8000))
-    except KeyboardInterrupt:
-        print("Bye!")
